@@ -1,6 +1,5 @@
 package dev.jorgealejandro.sdet.code_challenge.ui.components
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -28,58 +28,91 @@ import dev.jorgealejandro.sdet.code_challenge.ui.models.LoginViewModel
 import dev.jorgealejandro.sdet.code_challenge.ui.theme.CodechallengeTheme
 
 @Composable
-fun LoginComponent() {
+fun LoginComponent(
+    model: LoginViewModel? = null
+) {
     var user by remember { mutableStateOf(UserDto()) }
     val context = LocalContext.current
-    val viewModel: LoginViewModel = LoginViewModel()
 
     fun doLogin() {
         if (user.email.isEmpty() || user.password.isEmpty()) {
             Toast.makeText(context, "Complete both fields.", Toast.LENGTH_LONG).show()
         } else {
-            viewModel.onUIEvent(LoginEvent.DoLogin(user))
+            model?.onUIEvent(LoginEvent.DoLogin(user))
         }
     }
 
-    val state = viewModel.uiState
-    if (state.isError) {
-        Toast.makeText(context, "Wrong credentials", Toast.LENGTH_SHORT).show()
-    } else if (state.isSuccess) {
-        Toast.makeText(context, "Welcome!", Toast.LENGTH_SHORT).show()
-    } else if (state.isLoading) {
-        Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show()
+    fun doLogout() {
+        model?.onUIEvent(LoginEvent.DoLogout)
     }
 
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp)
-    ) {
-        LoginEmailField(
-            value = "email",
-            onValueChange = {
-                content -> user = user.copy(email = content.trim())
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        LoginPasswordField(
-            value = "password",
-            onValueChange = {
-                content -> user = user.copy(password = content.trim())
-            },
-            submit = { doLogin() },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(
-            onClick = { doLogin() },
-            enabled = true,
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.fillMaxWidth()
+    val state = model?.uiState
+    if (state?.isError == true) {
+        Toast.makeText(context, "Wrong credentials", Toast.LENGTH_SHORT).show()
+        model.onUIEvent(LoginEvent.OnErrorDispatched)
+    } else if (state?.isLoginSuccess == true) {
+        Toast.makeText(context, "Welcome!", Toast.LENGTH_SHORT).show()
+        val message = "Welcome ${state.userDto?.email}!"
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
         ) {
-            Text(text = "Login")
+            Text(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .align(Alignment.CenterHorizontally),
+                text = message
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = { doLogout() },
+                enabled = true,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Log out")
+            }
+        }
+
+        model.onUIEvent(LoginEvent.OnSuccessDispatched)
+    } else if (state?.isLoading == true) {
+        Toast.makeText(context, "Loading...", Toast.LENGTH_SHORT).show()
+        model.onUIEvent(LoginEvent.OnLoadingDispatched)
+    } else {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+        ) {
+            LoginEmailField(
+                value = user.email,
+                onValueChange = { content ->
+                    user = user.copy(email = content.trim())
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            LoginPasswordField(
+                value = user.password,
+                onValueChange = { content ->
+                    user = user.copy(password = content.trim())
+                },
+                submit = { doLogin() },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = { doLogin() },
+                enabled = true,
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Login")
+            }
         }
     }
 }

@@ -5,4 +5,8 @@ import dev.jorgealejandro.sdet.code_challenge.ui.base.UIEvent
 
 sealed class LoginEvent: UIEvent {
     data class DoLogin(val user: UserDto? = null): LoginEvent()
+    data object DoLogout: LoginEvent()
+    data object OnLoadingDispatched: LoginEvent()
+    data object OnSuccessDispatched: LoginEvent()
+    data object OnErrorDispatched: LoginEvent()
 }

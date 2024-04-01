@@ -27,7 +27,7 @@ fun LoginEmailField(
     val icon = @Composable {
         Icon(
             Icons.Default.Person,
-            contentDescription = "",
+            contentDescription = "Login field.",
             tint = MaterialTheme.colorScheme.primary
         )
     }

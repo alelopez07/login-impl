@@ -5,6 +5,6 @@ import dev.jorgealejandro.sdet.code_challenge.dto.UserDto
 data class LoginState(
     val userDto: UserDto? = null,
     val isLoading: Boolean = false,
-    val isSuccess: Boolean = false,
+    val isLoginSuccess: Boolean = false,
     val isError: Boolean = false
 )

@@ -75,10 +75,10 @@ fun LoginPasswordField(
         label = { Text(legend) },
         singleLine = true,
         visualTransformation =
-            if (isPasswordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            }
+        if (isPasswordVisible) {
+            VisualTransformation.None
+        } else {
+            PasswordVisualTransformation()
+        }
     )
 }
